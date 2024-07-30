@@ -4,7 +4,7 @@ import { lucia } from "@/auth";
 import prisma from "@/lib/prisma";
 import { signUpSchema, SignUpValues } from "@/lib/validation";
 
-import { hash } from "@node-rs/argon2"
+import { hash } from "@node-rs/argon2";
 import { generateIdFromEntropySize } from "lucia";
 import { isRedirectError } from "next/dist/client/components/redirect";
 import { cookies } from "next/headers";
@@ -14,14 +14,13 @@ export async function signUp(
   credentials: SignUpValues,
 ): Promise<{ error: string }> {
   try {
-
     const { username, email, password } = signUpSchema.parse(credentials);
 
     const passwordHash = await hash(password, {
       memoryCost: 19456,
       timeCost: 2,
       outputLen: 32,
-      parallelism: 1
+      parallelism: 1,
     });
 
     const userId = generateIdFromEntropySize(10);
@@ -30,31 +29,31 @@ export async function signUp(
       where: {
         username: {
           equals: username,
-          mode: "insensitive"
-        }
-      }
+          mode: "insensitive",
+        },
+      },
     });
 
-    if(existingUsername){
+    if (existingUsername) {
       return {
-        error: "Username already taken"
-      }
-    };
+        error: "Username already taken",
+      };
+    }
 
     const existingEmail = await prisma.user.findFirst({
       where: {
         email: {
           equals: email,
-          mode: "insensitive"
-        }
-      }
+          mode: "insensitive",
+        },
+      },
     });
 
-    if(existingEmail){
+    if (existingEmail) {
       return {
-        error: "Email already taken"
-      }
-    };
+        error: "Email already taken",
+      };
+    }
 
     await prisma.user.create({
       data: {
@@ -62,8 +61,8 @@ export async function signUp(
         username,
         displayName: username,
         email,
-        passwordHash
-      }
+        passwordHash,
+      },
     });
 
     const session = await lucia.createSession(userId, {});
@@ -71,13 +70,12 @@ export async function signUp(
     cookies().set(
       sessionCookie.name,
       sessionCookie.value,
-      sessionCookie.attributes
+      sessionCookie.attributes,
     );
-    
-    return redirect("/");
 
+    return redirect("/");
   } catch (error) {
-    if(isRedirectError(error)) throw error;
+    if (isRedirectError(error)) throw error;
     console.log(error);
     return {
       error: "Something went wrong. Please try again.",
