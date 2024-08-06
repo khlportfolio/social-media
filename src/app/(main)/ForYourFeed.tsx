@@ -8,6 +8,7 @@ import kyInstance from "@/lib/ky"
 import { Button } from "@/components/ui/button"
 import InfiniteScrollContainer from "@/components/InfiniteScrollContainer"
 import PostsLoadingSkeleton from "@/components/posts/PostsLoadingSkeleton"
+import DeletePostDialog from "@/components/posts/DeletePostDialog"
 
 const ForYourFeed = () => {
     const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, status } = useInfiniteQuery({
